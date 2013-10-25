@@ -146,4 +146,14 @@ class LazyCacheDao<T> extends Dao<T> {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
+  @Override
+  public Cursor<T> cursor(Connection conn, String where, Object... params) throws SQLException {
+    return standardDao.cursor(conn, where, params);
+  }
+
+  @Override
+  public Cursor<T> cursor(String where, Object... params) throws SQLException {
+    return standardDao.cursor(where, params);
+  }
+
 }

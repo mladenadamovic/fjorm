@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,10 +161,8 @@ public class StandardDao<T extends Object> extends Dao<T> {
     }
     return result;
   }
-
-  public List<T> readElementsFromResultSet(ResultSet rs) throws SQLException {
-    List<T> result = new ArrayList<T>();
-    while (rs.next()) {
+  
+  public T readElementFromResultSet(ResultSet rs) throws SQLException {
       try {
         T obj = tclass.getConstructor().newInstance();
         int i = 1;
@@ -171,7 +170,7 @@ public class StandardDao<T extends Object> extends Dao<T> {
           Field field = tclass.getField(nonIdField.getKey());
           setObjValueFromResultSet(field, obj, rs, i++, nonIdField.getValue());
         }
-        result.add(obj);
+        return obj;
       } catch (NoSuchFieldException ex) {
         Logger.getLogger(StandardDao.class.getName()).log(Level.SEVERE, null, ex);
       } catch (InstantiationException ex) {
@@ -187,9 +186,19 @@ public class StandardDao<T extends Object> extends Dao<T> {
       } catch (SecurityException ex) {
         Logger.getLogger(StandardDao.class.getName()).log(Level.SEVERE, null, ex);
       }
+      return null;
+  }
+
+  public List<T> readElementsFromResultSet(ResultSet rs) throws SQLException {
+    List<T> result = new ArrayList<T>();
+    while (rs.next()) {
+      T oneElem = readElementFromResultSet(rs);
+      if (oneElem != null) {
+        result.add(oneElem);
+      }
     }
-      return result;
-    }
+    return result;
+  }
 
   public StringBuilder getQueryBeforeWhere() {
     StringBuilder query = new StringBuilder();
@@ -204,8 +213,8 @@ public class StandardDao<T extends Object> extends Dao<T> {
   private static void addWhereFieldToQuery(StringBuilder query, String where) {
     if (where != null && where.length() > 0) {
       String trimmedLower = where.trim().toLowerCase();
-      if (!trimmedLower.startsWith("where") && !trimmedLower.startsWith("order") && !trimmedLower.startsWith("limit ") && !trimmedLower.startsWith("inner ")
-              &&!trimmedLower.startsWith("outer ") && !trimmedLower.startsWith("join ")) {
+      if (trimmedLower.length() > 0 && !trimmedLower.startsWith("where") && !trimmedLower.startsWith("order") && !trimmedLower.startsWith("limit ") 
+              && !trimmedLower.startsWith("inner ") &&!trimmedLower.startsWith("outer ") && !trimmedLower.startsWith("join ")) {
         where = "where " + where;
       }
       query.append(" ").append(where);
@@ -323,7 +332,7 @@ public class StandardDao<T extends Object> extends Dao<T> {
   @Override
   public T create(Connection conn, T entity) throws SQLException {
     String query = getQueryForCreate();
-    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Query={0}", query);
+    //Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Query={0}", query);
 
     PreparedStatement ps = conn.prepareStatement(query.toString(), Statement.RETURN_GENERATED_KEYS);
     try {
@@ -334,7 +343,7 @@ public class StandardDao<T extends Object> extends Dao<T> {
       for (Map.Entry<String, Class> fieldToType : nonIdFieldsToType.entrySet()) {
         setPreparedStatementFromEntityField(fieldToType.getKey(), fieldToType.getValue(), entity, ps, i++);
       }
-      Logger.getLogger(this.getClass().getName()).log(Level.INFO, "ps={0}", ps.toString());
+      //Logger.getLogger(this.getClass().getName()).log(Level.INFO, "ps={0}", ps.toString());
       ps.execute();
       // attach generated key to the object if possible
       if (idFieldName != null && idFieldName.length() > 0) {
@@ -505,7 +514,7 @@ public class StandardDao<T extends Object> extends Dao<T> {
     PreparedStatement ps = conn.prepareStatement("delete from " + tableName + " where " + idFieldName + " = ?");
     try {
       setPreparedStatementFromObject(idFieldName, idFieldType, key, ps, 1);
-      Logger.getLogger(this.getClass().getName()).log(Level.INFO, "ps = {0}", ps.toString());
+      //Logger.getLogger(this.getClass().getName()).log(Level.INFO, "ps = {0}", ps.toString());
       result = ps.execute();
     } finally {
       close(ps);
@@ -522,7 +531,7 @@ public class StandardDao<T extends Object> extends Dao<T> {
       try {
         ps = conn.prepareStatement("delete from " + tableName + " where " + idFieldName + " = ?");
         setPreparedStatementFromEntityField(idFieldName, idFieldType, entity, ps, 1);
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "ps = {0}", ps.toString());
+        //Logger.getLogger(this.getClass().getName()).log(Level.INFO, "ps = {0}", ps.toString());
         result =  ps.execute();
       } finally { 
         close(ps);
@@ -740,6 +749,69 @@ public class StandardDao<T extends Object> extends Dao<T> {
       close(conn);
     }
     return result;
+  }
+
+  @Override
+  public Cursor<T> cursor(Connection conn, String where, Object... params) throws SQLException {
+    return cursor(conn, false, where, params);
+  }
+  
+  public Cursor<T> cursor(String where, Object... params) throws SQLException {
+    Connection conn = daoProperties.createConnection();
+    return cursor(conn, true, where, params);
+  }
+  
+  private Cursor<T> cursor(final Connection conn, final boolean closeConnection, String where, Object... params) throws SQLException {
+    StringBuilder query = getQueryBeforeWhere();
+    addWhereFieldToQuery(query, where);
+    final PreparedStatement ps = conn.prepareStatement(query.toString());
+    final ResultSet rs = ps.executeQuery();
+    Cursor<T> cursor = new Cursor<T>() {
+  
+      public boolean hasNext()  {
+        try {
+          boolean result =  !rs.isLast();
+          return result;
+        } catch (SQLException ex) {
+          Logger.getLogger(StandardDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+      }
+
+      public T next() {
+        try {
+          if (rs.next()) {
+            return readElementFromResultSet(rs);
+          }
+          return null;
+        } catch (SQLException ex) {
+          Logger.getLogger(StandardDao.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+      }
+
+      public void remove() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+      }
+      
+      public void close() {
+        try {
+          //StandardDao.close(rs);
+          StandardDao.close(ps);
+        } catch (SQLException ex) {
+          Logger.getLogger(StandardDao.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+          if (closeConnection) {
+            try {
+              StandardDao.close(conn);
+            } catch (SQLException ex) {
+              Logger.getLogger(StandardDao.class.getName()).log(Level.SEVERE, null, ex);
+            }
+          }
+        }
+      }
+    };
+    return cursor;
   }
 
 }

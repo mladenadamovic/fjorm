@@ -96,4 +96,8 @@ public abstract class Dao<T> {
 
   public abstract <K> Map<K, T> readAllAsMap() throws SQLException;
   
+  public abstract Cursor<T> cursor(Connection conn, String where, Object... params) throws SQLException;
+
+  public abstract Cursor<T> cursor(String where, Object... params) throws SQLException;
+
 }

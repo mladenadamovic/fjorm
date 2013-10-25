@@ -194,4 +194,14 @@ public class FullCacheDao<T> extends Dao<T> {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
+  @Override
+  public Cursor<T> cursor(Connection conn, String where, Object... params) throws SQLException {
+    throw new UnsupportedOperationException("No point in using cursor over data which are in cache, use read instead."); 
+  }
+
+  @Override
+  public Cursor<T> cursor(String where, Object... params) throws SQLException {
+    throw new UnsupportedOperationException("No point in using cursor over data which are in cache, use read instead."); 
+  }
+
 }

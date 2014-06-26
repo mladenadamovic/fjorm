@@ -114,12 +114,27 @@ public class StandardDao<T extends Object> extends Dao<T> {
   
   public static void setObjValueFromResultSet(Field field, Object obj, ResultSet rs, int i, Class fieldType) {
     try {
-      if (fieldType.equals(Integer.class) || fieldType.equals(int.class)) {
+      if (fieldType.equals(Integer.class)) {
+        Integer value = (Integer) rs.getObject(i++);
+        field.set(obj, value);
+      } else if (fieldType.equals(int.class)) {
         field.set(obj, rs.getInt(i++));
       } else if (fieldType.equals(String.class)) {
         field.set(obj, rs.getString(i++));
       } else if (fieldType.equals(Double.class) || fieldType.equals(double.class)) {
-        field.set(obj, rs.getDouble(i++));
+        Double value = (Double) rs.getObject(i++);
+        if (value == null) {
+          field.set(obj, Double.NaN);
+        } else {
+          field.set(obj, value.doubleValue());
+        }
+      } else if (fieldType.equals(double.class)) {
+        Double value = (Double) rs.getObject(i++);
+        if (value == null) {
+          field.set(obj, Double.NaN);
+        } else {
+          field.set(obj, value);
+        }
       } else if (fieldType.equals(Float.class) || fieldType.equals(float.class)) {
         field.set(obj, rs.getFloat(i++));
       } else if (fieldType.equals(Date.class)) {
@@ -170,6 +185,7 @@ public class StandardDao<T extends Object> extends Dao<T> {
           Field field = tclass.getField(nonIdField.getKey());
           setObjValueFromResultSet(field, obj, rs, i++, nonIdField.getValue());
         }
+        //Logger.getLogger(StandardDao.class.getName()).info("read " + obj.toString());
         return obj;
       } catch (NoSuchFieldException ex) {
         Logger.getLogger(StandardDao.class.getName()).log(Level.SEVERE, null, ex);

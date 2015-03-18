@@ -239,7 +239,7 @@ We don't limit you to one particular way how to test applications written using 
 
 There are few possibilities to consider:
  * you could create different subclasses of `DaoProperties` i.e. `ServerDaoProperties`, `LocalDaoProperties` and `TestDaoProperties` and inject `DaoProperties` with either static call i.e. with method `setDaoProperties` or otherwise
- * you could mock each Dao object (i.e. name it `MockDao`) and inject on aparticular place. You can use [http://easymock.org/ EasyMock] or [http://code.google.com/p/google-guice/wiki/GettingStarted Guice] or other tool for mocking objects
+ * you could mock each Dao object (i.e. name it `MockDao`) and inject on aparticular place. You can use [EasyMock](http://easymock.org/) or [Guice](https://github.com/google/guice/wiki/GettingStarted) or other tool for mocking objects
  * you could use a properties file for different database server configurations
  * other way which you do like - we are not trying to limit you here, show some creativity on the way you like to do it
  

@@ -80,9 +80,14 @@ public class StandardDao<T extends Object> extends Dao<T> {
         questionInsteadOfNonIdFieldsBuilder.append('?');
       }
       allFieldsToType.put(field.getName(), field.getType());
+      CompositeKey composite = (CompositeKey) field.getAnnotation(CompositeKey.class);
+      if (composite != null) {
+        compositeKeyFieldsToType.put(field.getName(), field.getType());
+      }
     }
     nonIdFieldsCommaSeparated = nonIdFieldsToFetchBuilder.toString();
     nonIdFieldsWithTablePrefixCommaSeparated = nonIdFieldsWithTablePrefixCommaSeparatedBuilder.toString();
+    
     questionInsteadOfNonIdFields = questionInsteadOfNonIdFieldsBuilder.toString();
 
     updateAllFieldsCommaSeparated();
@@ -481,7 +486,7 @@ public class StandardDao<T extends Object> extends Dao<T> {
     isFirst = true;
     for (Map.Entry<String, Class> fieldToType : compositeKeyFieldsToType.entrySet()) {
       if (!isFirst) {
-        query.append(", ");
+        query.append(" and ");
       } else {
         isFirst = false;
       }

@@ -25,7 +25,7 @@ That is how *fjorm* is born, the author of fjorm have seen several projects whic
 Please look at [http://www.tralev.com](Tralev) before you read this example to understand what the following code does.
 
 Table image_info represent information about image and table image_vote stores votes from the user about the image:
-{{{
+```
 create table image_info(
   id int auto_increment primary key,
   uploader_username varchar(255),
@@ -55,10 +55,10 @@ create table image_vote(
   FOREIGN KEY (image_id) REFERENCES image_info(id)
 )DEFAULT CHARACTER SET utf8;
 CREATE INDEX image_vote_image_idx on image_vote (image_id);
-}}}
+```
 
 This is in Class for representing image_info in Java:
-{{{
+```
 @TableName(table = "image_info")
 public class ImageInfo {
 
@@ -86,10 +86,10 @@ public class ImageInfo {
   public int height;
 
 }
-}}}
+```
 
 Table for storing info about images user did like:
-{{{
+```
 @TableName(table = "image_vote")
 public class ImageVote {
   @Id
@@ -103,40 +103,40 @@ public class ImageVote {
   public int year;
 }
 
-}}}
+```
 
 #Look at these examples to see how code with fjorm is much simpler than JDBC: 
 
 ###Creating new image_info  
-{{{
+```
   Dao<ImageInfo> imageInfoDao = Dao.<ImageInfo>getDao(ImageInfo.class, TralevDaoProperties.getInstance());
   newImageInfo = imageInfoDao.create(newImageInfo);
   if (newImageInfo.id > 0) {
     // ... code ommitted
   }
-}}}
+```
 
 ###Getting uploads from user
-{{{
+```
   List<ImageInfo> imagesFromUser = imageInfoDao.read(" where uploader_username = ? order by id desc limit 1000", email);
-}}}
+```
 
 ###Getting images near given coordinates (lat, lng)
-{{{
+```
   List<ImageInfo> imagesToReturn = imageInfoDao.read("where lat > ? and lat < ? and lng > ? and lng < ? limit 2000", 
        lat - 0.2, lat + 0.2, lng - 0.2, lng + 0.2);
   addDistancesToEachImageInfo(imagesToReturn, lat, lng);
   //smarly filter images according to distance and popularity
   Collections.sort(imagesToReturn, Collections.reverseOrder(new ImageInfoComparatorUsingPopularityAndDistance()));
-}}}
+```
 
 
 
 ###Getting pictures which user liked
-{{{
+```
   List<ImageInfo> imagesUserLiked = imageInfoDao.read(" inner join image_vote on image_info.id = image_vote.image_id " + 
               "where image_vote.username = ? and image_vote.vote = 1 order by image_vote.id desc limit 1000", email);
-}}}
+```
 
 ##Download##
 [https://github.com/mladenadamovic/fjorm/blob/master/dist/fjorm.jar](Jar file)
@@ -154,7 +154,7 @@ Fjorm supports cursors with cursor(...) methods in Dao objects.
 
 This example iterates votes of images on Tralev.com website without loading them all in the memory. It prints the number of positive votes and negative votes in `image_vote` table:
 
-{{{
+```
       Dao<ImageVote> imageVoteDao = Dao.<ImageVote>getDao(ImageVote.class, TralevDaoProperties.getInstance());
       int positiveVotes = 0;
       int negativeVotes = 0;
@@ -168,14 +168,14 @@ This example iterates votes of images on Tralev.com website without loading them
         }
       }
       System.out.println("Positive votes = " + positiveVotes + ", negative votes = " + negativeVotes);
-}}}
+```
 
 `Cursor` method supports the same parameters as `read` method and returns `iterator` for data which will be fetched one by one.
 
 For example, to iterate only positive votes in `image_vote` table:
-{{{
+```
       Iterator<ImageVote> imageVoteCursorAllTable = imageVoteDao.cursor("vote > 0");
-}}}
+```
 
 #Configuration of the database and note about testing
 
@@ -183,23 +183,23 @@ For example, to iterate only positive votes in `image_vote` table:
 
 To instantiate Dao object, you have to pass a object which extends `DaoProperties` i.e.
 
-{{{
+```
 Dao<ImageInfo> imageInfoDao = Dao.<ImageInfo>getDao(ImageInfo.class, TralevDaoProperties.getInstance());
-}}}
+```
 
 
 Each class which extends `DaoProperties` has to implement three methods:
-{{{
+```
 public abstract String getDbServer();
 public abstract String getDbUser();
 public abstract String getDbPass();
 public abstract String getDriverName();
-}}}
+```
 
 and that's all. Not at all difficult. No XML, you don't need to use java properties if you don't want to (but you an implement it using java properties if you want). Simple.
 
 And this is an example:
-{{{
+```
 public class TralevDaoProperties extends DaoProperties {
 
   static TralevDaoProperties dao = new TralevDaoProperties();
@@ -234,7 +234,7 @@ public class TralevDaoProperties extends DaoProperties {
   }
 
 }
-}}}
+```
 
 ##Testing
 
@@ -263,7 +263,7 @@ For list of supported operations you can look up in [https://code.google.com/p/f
 Some examples (let's learn from examples):
 
 ###Example for Create and readFirst
-{{{
+```
   public static boolean writeLikesForUser(int id, int vote, String email) {
     try {
       Dao<ImageVote> imageVoteDao = Dao.<ImageVote>getDao(ImageVote.class, TralevDaoProperties.getInstance());
@@ -289,11 +289,11 @@ Some examples (let's learn from examples):
     return false;
   }
 
-}}}
+```
 
 
 ##Example for delete and for deleteByKey
-{{{
+```
   public static boolean deleteImage(int id) {
     Logger.getLogger(ImageUtils.class.getName()).log(Level.INFO, "started dequying all...");
     ImageCacheCreatorRunnable.getInstanceAndRunIfNotRunned().dequeueAll(id);
@@ -323,44 +323,44 @@ Some examples (let's learn from examples):
       return false;
     }
   }
-}}}
+```
 
 ##Examples for read
 
-{{{
+```
 //getting images which are not moderated
 imageInfoDao.read("moderator_score = 0 order by id asc limit " + limit);
-}}}
+```
 
-{{{
+```
 // getting images which user did like
 imageInfoDao.read(" inner join image_vote on image_info.id = image_vote.image_id " + 
               "where image_vote.username = ? and image_vote.vote = 1 order by image_vote.id desc limit 1000", email);
-}}}
+```
 
-{{{
+```
 //getting images which user did upload
 imageInfoDao.read(" where uploader_username = ? order by id desc limit 1000", email);
-}}}
+```
 
-{{{
+```
 //get recent uploads by user. Recent uploads are still not reviewed by moderator
 imageInfoDao.read(" where uploader_username = ? and moderator_score = 0 order by id desc limit 100", email);
-}}}
+```
 
 
-{{{
+```
 ///get images near given lat,lng
 imageInfoDao.read("where lat > ? and lat < ? and lng > ? and lng < ? limit 2000", lat - 0.2, lat + 0.2, lng - 0.2, lng + 0.2);
-}}}
+```
 
 ##Examples for readAll
-{{{
+```
    List<CityInfo> cityInfos = citiesInfoDao.readAll();
-}}}
+```
 
 ##Examples for update
-{{{
+```
   public static boolean setModeratorScore(int id, int moderator_score) {
     try {
       Dao<ImageInfo> imageInfoDao = Dao.<ImageInfo>getDao(ImageInfo.class, TralevDaoProperties.getInstance());
@@ -376,10 +376,10 @@ imageInfoDao.read("where lat > ? and lat < ? and lng > ? and lng < ? limit 2000"
       return false;
     }
   }
-}}}
+```
 
 
-{{{
+```
   public static boolean writeLikesForUser(int id, int vote, String email) {
     try {
       Dao<ImageVote> imageVoteDao = Dao.<ImageVote>getDao(ImageVote.class, TralevDaoProperties.getInstance());
@@ -404,7 +404,7 @@ imageInfoDao.read("where lat > ? and lat < ? and lng > ? and lng < ? limit 2000"
     }
     return false;
   }
-}}}
+```
 
 #Caching strategies
 
@@ -417,7 +417,7 @@ fjorm supports 3 caching strategies for tables:
 3. `FullCache` - on init, the whole content of the database will be read, and standard CRUD operation will use in-memory content. Complex SQL queries still go to the database.
 
 To use `LazyCache` or `FullCache` annotate the Class with its annotations, i.e.
-{{{
+```
 @FullCache
 @TableName(table = "city")
 public class CityInfo {
@@ -436,13 +436,13 @@ public class CityInfo {
 
 }
 
-}}}
+```
 
 #Design rules with app with fjorm
 
 
 Example Table:
-{{{
+```
 create table image_vote(
   id int auto_increment primary key,
   image_id int,
@@ -453,10 +453,10 @@ create table image_vote(
   FOREIGN KEY (image_id) REFERENCES image_info(id)
 )DEFAULT CHARACTER SET utf8;
 CREATE INDEX image_vote_image_idx on image_vote (image_id);
-}}}
+```
 
 Corresponding Mapping:
-{{{
+```
 package com.tralev.server;
 
 import fjorm.AutoGenerated;
@@ -479,7 +479,7 @@ public class ImageVote {
   public int year;
 
 }
-}}}
+```
 
 ##Rule no1: no submappings - database objects cannot be contained explicitly
 
@@ -499,32 +499,32 @@ fjorm do not support automatic generation of mappings. Why? Because we didn't ne
 
 To map the class to the database use annotation 'TableName', i.e.
 
-{{{
+```
  @TableName(table = "image_vote")
-}}}
+```
 
 If the field is `Id` annotate it as well, if the field uses the key generated from the database annotate it with `AutoGenerated`, i.e.
-{{{
+```
   @Id
   @AutoGenerated
   public int id;
-}}}
+```
 
 
 If two or more fields are composite key for the table, specify it with `CompositeKey` annotation, i.e.
-{{{
+```
   @CompositeKey
   public String title;
 
   @CompositeKey
   public String subtitle;
-}}}
+```
 
 If you want to have a public field in your Class which is not persisted in the database annodate it with `Transient`, i.e. from ImageInfo example
-{{{
+```
   @Transient
   public double distance_meters;
-}}}
+```
 
 ##Remember
 

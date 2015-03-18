@@ -1,6 +1,6 @@
 #fjorm - Fast Java Object Relationship Mapping
 
-Performance testing of Hibernate (and many other available tools like JDO) suggests that Hibernate applications might be orders of magnitude slower than plain JDBC applications. polepos.org tests suggested in 2013 that Hibernate/MySQL, for example, is around 250% slower than MySQL/JDBC in their complex concurrency test [http://polepos.sourceforge.net/results/PolePositionClientServer.pdf (reference)].
+Performance testing of Hibernate (and many other available tools like JDO) suggests that Hibernate applications might be orders of magnitude slower than plain JDBC applications. polepos.org tests suggested in 2013 that Hibernate/MySQL, for example, is around 250% slower than MySQL/JDBC in their complex concurrency test http://polepos.sourceforge.net/results/PolePositionClientServer.pdf .
 
 That is how *fjorm* is born, the author of fjorm have seen several projects which performance suffered deeply from using ORM. After analyzing Hibernate code (and some JDBC patterns) he wanted to make ORM better, especially efficient. 
 
@@ -17,12 +17,12 @@ That is how *fjorm* is born, the author of fjorm have seen several projects whic
   * using of standard SQL 'where' clause possible
   * CRUD ready, but does not support nested objects
   * designed by former Google software engineer
-  * it is stable. It has been used by [http://www.numbeo.com](Numbeo), [http://www.tralev.com](Tralev), [http://www.online-utility.org](Online-Utility), [http://www.decisioncrowd.com](DecisionCrowd) etc.
+  * it is stable. It has been used by [Numbeo](http://www.numbeo.com), [Tralev](http://www.tralev.com), [Online-Utility](http://www.online-utility.org), [DecisionCrowd](http://www.decisioncrowd.com) etc.
 
 
 #Example usages (from Tralev.com)
 
-Please look at [http://www.tralev.com](Tralev) before you read this example to understand what the following code does.
+Please look at [Tralev](http://www.tralev.com) before you read this example to understand what the following code does.
 
 Table image_info represent information about image and table image_vote stores votes from the user about the image:
 ```
@@ -138,9 +138,6 @@ public class ImageVote {
               "where image_vote.username = ? and image_vote.vote = 1 order by image_vote.id desc limit 1000", email);
 ```
 
-##Download##
-[https://github.com/mladenadamovic/fjorm/blob/master/dist/fjorm.jar](Jar file)
-
 #Cursors - iterating data from the table without loading them all
 
 ##Introduction
@@ -251,14 +248,14 @@ There are few possibilities to consider:
 fjorm is supposed to work on whatever you can run Java onto. 
 
 It has following external dependencies:
-  * [http://commons.apache.org/proper/commons-pool/](Apache Commons Pool), [http://www.poolsaboveground.com/apache//commons/pool/binaries/commons-pool-1.6-bin.zip](download v1.6 here)
-  * [http://commons.apache.org/proper/commons-dbcp/](Apache Commons DBCP), [http://www.gtlib.gatech.edu/pub/apache//commons/dbcp/binaries/commons-dbcp-1.4-bin.zip](download v1.4 here)
+  * [Apache Commons Pool](http://commons.apache.org/proper/commons-pool/),   
+  * [Apache Commons DBCP](http://commons.apache.org/proper/commons-dbcp/), 
 
 You'll need to use JAR file of your database driver. Fjorm is supposed to work with any database and it has been initially developed using MySQL. You can find a [http://dev.mysql.com/downloads/connector/j/](MySQL driver here).
 
 #CRUD Operations which fjorm enables you to use
 
-For list of supported operations you can look up in [https://code.google.com/p/fjorm/source/browse/src/fjorm/Dao.java](Dao interface source code).
+For list of supported operations you can look up in Dao.class interface source code.
 
 Some examples (let's learn from examples):
 
@@ -529,6 +526,9 @@ If you want to have a public field in your Class which is not persisted in the d
 ##Remember
 
 1. fjorm requires you to use the same field name in the database as in java. *This is done to prevent confusion*. Name fields clear in the database and then fjorm will use that clear name as well. Less confusion.
+
+#Download
+[Jar file](https://github.com/mladenadamovic/fjorm/blob/master/dist/fjorm.jar)
 
 
 

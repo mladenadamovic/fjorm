@@ -1,4 +1,4 @@
-=fjorm - Fast Java Object Relationship Mapping=
+#fjorm - Fast Java Object Relationship Mapping
 
 Performance testing of Hibernate (and many other available tools like JDO) suggests that Hibernate applications might be orders of magnitude slower than plain JDBC applications. polepos.org tests suggested in 2013 that Hibernate/MySQL, for example, is around 250% slower than MySQL/JDBC in their complex concurrency test [http://polepos.sourceforge.net/results/PolePositionClientServer.pdf (reference)].
 
@@ -6,7 +6,7 @@ That is how *fjorm* is born, the author of fjorm have seen several projects whic
 
 *fjorm* enables users to use relational databases, fast but simple object relationship mapping, without vendor lock-in (no cloud, but it is cloud ready).
 
-==fjorm features:==
+#fjorm features:
   * designed to have less than 10% performance overhead over plain SQL
   * facilitate faster application development and cleaner code
   * no XML
@@ -20,7 +20,7 @@ That is how *fjorm* is born, the author of fjorm have seen several projects whic
   * it is stable. It has been used by [http://www.numbeo.com Numbeo], [http://www.tralev.com Tralev], [http://www.online-utility.org Online-Utility], [http://www.decisioncrowd.com DecisionCrowd] etc.
 
 
-==Example usages (from Tralev.com)==
+#Example usages (from Tralev.com)
 
 Please look at [http://www.tralev.com Tralev] before you read this example to understand what the following code does.
 
@@ -105,9 +105,9 @@ public class ImageVote {
 
 }}}
 
-=Look at these examples to see how code with fjorm is much simpler than JDBC: =
+#Look at these examples to see how code with fjorm is much simpler than JDBC: 
 
-===Creating new image_info  ===
+###Creating new image_info  
 {{{
   Dao<ImageInfo> imageInfoDao = Dao.<ImageInfo>getDao(ImageInfo.class, TralevDaoProperties.getInstance());
   newImageInfo = imageInfoDao.create(newImageInfo);
@@ -116,12 +116,12 @@ public class ImageVote {
   }
 }}}
 
-===Getting uploads from user===
+###Getting uploads from user
 {{{
   List<ImageInfo> imagesFromUser = imageInfoDao.read(" where uploader_username = ? order by id desc limit 1000", email);
 }}}
 
-===Getting images near given coordinates (lat, lng)===
+###Getting images near given coordinates (lat, lng)
 {{{
   List<ImageInfo> imagesToReturn = imageInfoDao.read("where lat > ? and lat < ? and lng > ? and lng < ? limit 2000", 
        lat - 0.2, lat + 0.2, lng - 0.2, lng + 0.2);

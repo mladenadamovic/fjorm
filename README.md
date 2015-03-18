@@ -17,12 +17,12 @@ That is how *fjorm* is born, the author of fjorm have seen several projects whic
   * using of standard SQL 'where' clause possible
   * CRUD ready, but does not support nested objects
   * designed by former Google software engineer
-  * it is stable. It has been used by [http://www.numbeo.com Numbeo], [http://www.tralev.com Tralev], [http://www.online-utility.org Online-Utility], [http://www.decisioncrowd.com DecisionCrowd] etc.
+  * it is stable. It has been used by [http://www.numbeo.com](Numbeo), [http://www.tralev.com](Tralev), [http://www.online-utility.org](Online-Utility), [http://www.decisioncrowd.com](DecisionCrowd) etc.
 
 
 #Example usages (from Tralev.com)
 
-Please look at [http://www.tralev.com Tralev] before you read this example to understand what the following code does.
+Please look at [http://www.tralev.com](Tralev) before you read this example to understand what the following code does.
 
 Table image_info represent information about image and table image_vote stores votes from the user about the image:
 {{{
@@ -132,25 +132,25 @@ public class ImageVote {
 
 
 
-===Getting pictures which user liked===
+###Getting pictures which user liked
 {{{
   List<ImageInfo> imagesUserLiked = imageInfoDao.read(" inner join image_vote on image_info.id = image_vote.image_id " + 
               "where image_vote.username = ? and image_vote.vote = 1 order by image_vote.id desc limit 1000", email);
 }}}
 
-==Download==
-[https://code.google.com/p/fjorm/source/browse/dist/fjorm.jar Jar file]
+##Download##
+[https://github.com/mladenadamovic/fjorm/blob/master/dist/fjorm.jar](Jar file)
 
-#summary Cursors - iterating data from the table without loading them all
+#Cursors - iterating data from the table without loading them all
 
-= Introduction =
+##Introduction
 
 Cursors are the way to enable application to use data from the select query without loading all applicable rows in the memory.
 
 Fjorm supports cursors with cursor(...) methods in Dao objects.
 
 
-= Example =
+##Example
 
 This example iterates votes of images on Tralev.com website without loading them all in the memory. It prints the number of positive votes and negative votes in `image_vote` table:
 
@@ -177,11 +177,9 @@ For example, to iterate only positive votes in `image_vote` table:
       Iterator<ImageVote> imageVoteCursorAllTable = imageVoteDao.cursor("vote > 0");
 }}}
 
+#Configuration of the database and note about testing
 
-
-#summary Configuration of the database and note about testing
-
-= Introduction =
+##Introduction
 
 To instantiate Dao object, you have to pass a object which extends `DaoProperties` i.e.
 
@@ -238,7 +236,7 @@ public class TralevDaoProperties extends DaoProperties {
 }
 }}}
 
-==Testing==
+##Testing
 
 We don't limit you to one particular way how to test applications written using fjorm.
 
@@ -248,23 +246,23 @@ There are few possibilities to consider:
  * you could use a properties file for different database server configurations
  * other way which you do like - we are not trying to limit you here, show some creativity on the way you like to do it
  
- #summary Requirements and dependencies
+#Requirements and dependencies
 
 fjorm is supposed to work on whatever you can run Java onto. 
 
 It has following external dependencies:
-  * [http://commons.apache.org/proper/commons-pool/ Apache Commons Pool], [http://www.poolsaboveground.com/apache//commons/pool/binaries/commons-pool-1.6-bin.zip download v1.6 here]
-  * [http://commons.apache.org/proper/commons-dbcp/ Apache Commons DBCP], [http://www.gtlib.gatech.edu/pub/apache//commons/dbcp/binaries/commons-dbcp-1.4-bin.zip download v1.4 here]
+  * [http://commons.apache.org/proper/commons-pool/](Apache Commons Pool), [http://www.poolsaboveground.com/apache//commons/pool/binaries/commons-pool-1.6-bin.zip](download v1.6 here)
+  * [http://commons.apache.org/proper/commons-dbcp/](Apache Commons DBCP), [http://www.gtlib.gatech.edu/pub/apache//commons/dbcp/binaries/commons-dbcp-1.4-bin.zip](download v1.4 here)
 
-You'll need to use JAR file of your database driver. Fjorm is supposed to work with any database and it has been initially developed using MySQL. You can find a [http://dev.mysql.com/downloads/connector/j/ MySQL driver here].
+You'll need to use JAR file of your database driver. Fjorm is supposed to work with any database and it has been initially developed using MySQL. You can find a [http://dev.mysql.com/downloads/connector/j/](MySQL driver here).
 
-#summary CRUD Operations which fjorm enables you to use
+#CRUD Operations which fjorm enables you to use
 
-For list of supported operations you can look up in [https://code.google.com/p/fjorm/source/browse/src/fjorm/Dao.java Dao interface source code].
+For list of supported operations you can look up in [https://code.google.com/p/fjorm/source/browse/src/fjorm/Dao.java](Dao interface source code).
 
 Some examples (let's learn from examples):
 
-===Example for Create and readFirst===
+###Example for Create and readFirst
 {{{
   public static boolean writeLikesForUser(int id, int vote, String email) {
     try {
@@ -294,7 +292,7 @@ Some examples (let's learn from examples):
 }}}
 
 
-==Example for delete and for deleteByKey==
+##Example for delete and for deleteByKey
 {{{
   public static boolean deleteImage(int id) {
     Logger.getLogger(ImageUtils.class.getName()).log(Level.INFO, "started dequying all...");
@@ -327,7 +325,7 @@ Some examples (let's learn from examples):
   }
 }}}
 
-==Examples for read==
+##Examples for read
 
 {{{
 //getting images which are not moderated
@@ -356,12 +354,12 @@ imageInfoDao.read(" where uploader_username = ? and moderator_score = 0 order by
 imageInfoDao.read("where lat > ? and lat < ? and lng > ? and lng < ? limit 2000", lat - 0.2, lat + 0.2, lng - 0.2, lng + 0.2);
 }}}
 
-==Examples for readAll==
+##Examples for readAll
 {{{
    List<CityInfo> cityInfos = citiesInfoDao.readAll();
 }}}
 
-==Examples for update==
+##Examples for update
 {{{
   public static boolean setModeratorScore(int id, int moderator_score) {
     try {
@@ -408,7 +406,7 @@ imageInfoDao.read("where lat > ? and lat < ? and lng > ? and lng < ? limit 2000"
   }
 }}}
 
-#summary Caching strategies
+#Caching strategies
 
 fjorm supports 3 caching strategies for tables:
 
@@ -440,7 +438,7 @@ public class CityInfo {
 
 }}}
 
-#summary Design rules with app with fjorm
+#Design rules with app with fjorm
 
 
 Example Table:
@@ -483,22 +481,19 @@ public class ImageVote {
 }
 }}}
 
-==Rule no1: no submappings - database objects cannot be contained explicitly==
+##Rule no1: no submappings - database objects cannot be contained explicitly
 
 m:1 and m:n mappings inside Java Objects are evil and root of many performance problems in existing ORMs for Java. *We don't want to support it.* 
 
-==Rule no2: each field from the database shall be public in Java==
+##Rule no2: each field from the database shall be public in Java
 
 Do you really think that `int getVote()` and `void setVote(int vote)` actually is beneficial? If you change the vote 'imageVote.vote = 1;' you know that the field changed, there is side effect. Getters and setters are frequently just overheard unless you work with special cases. We want you to declare fields as public rather than use getters and setters! It produces clearer code without side effects in normal cases.
 
-==Rule no3: field name from the database has to be the same in Java==
+##Rule no3: field name from the database has to be the same in Java
 
 fjorm requires you to use the same field name in the database as in java. *This is done to prevent confusion*. You shall name fields clear in the database and then fjorm will use that clear name as well. Less confusion. If the database field do not have clear name, rename it, if possible. Otherwise, cope with your database naming decision.
 
-#summary What you have to know to creating mappings
-
-
-=Mappings=
+#What you have to know to creating mappings
 
 fjorm do not support automatic generation of mappings. Why? Because we didn't need it. Creating manually Class objects from 'create table' statement usually requires around 1 minute manually and for application with less than 60 tables it is possible to do it in 1 hour. If doing automatic creation, you'd have to set it up and to check if it is done correctly. It might take you approximately same amount of time. That's why with fjorm you have to do it manually.
 
@@ -531,10 +526,9 @@ If you want to have a public field in your Class which is not persisted in the d
   public double distance_meters;
 }}}
 
-==Remember==
+##Remember
 
 1. fjorm requires you to use the same field name in the database as in java. *This is done to prevent confusion*. Name fields clear in the database and then fjorm will use that clear name as well. Less confusion.
-
 
 
 
